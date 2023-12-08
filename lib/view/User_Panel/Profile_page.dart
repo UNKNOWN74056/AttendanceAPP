@@ -112,7 +112,7 @@ class _Profile_pageState extends State<Profile_page> {
                                     ? CachedNetworkImage(
                                         imageUrl: data['image'] ?? '',
                                         placeholder: (context, url) =>
-                                            const CircularProgressIndicator(),
+                                            const SizedBox(),
                                         errorWidget: (context, url, error) =>
                                             const Icon(Icons.error),
                                       )

@@ -1,3 +1,4 @@
+import 'package:attendance_app/components/Another_Account_Button.dart';
 import 'package:attendance_app/components/Save_button.dart';
 import 'package:attendance_app/components/Text_field_widget.dart';
 import 'package:attendance_app/components/colors.dart';
@@ -43,7 +44,7 @@ class _Login_pageState extends State<Login_page> {
                     return Text_Form_Field(
                       controller: logincontroller.emailController,
                       hintext: "Enter your email",
-                      prefixicon: const Icon(FontAwesomeIcons.envelope),
+                      prefixicon: const Icon(FontAwesomeIcons.solidEnvelope),
                       errortext: value.email.error,
                       maxlines: 1,
                       onchange: (String value) {
@@ -100,8 +101,7 @@ class _Login_pageState extends State<Login_page> {
                       text: "Login",
                       ontap: () {
                         if (!logincontroller.isvalid) {
-                          utils.Show_Flushbar_Error_Message(
-                              "Please enter your field", context);
+                          utils.showToastMessage("Please enter your field");
                         } else {
                           loginuser.login(
                             UserModel(
@@ -116,22 +116,31 @@ class _Login_pageState extends State<Login_page> {
                     );
                   },
                 ),
-
+                const Gutter(),
+                const Center(child: Text("Or Continue with")),
+                const Gutter(),
+                GestureDetector(
+                  onTap: () async {
+                    await loginuser.signInWithGoogle(context);
+                  },
+                  child: const AnotherAccountButton(
+                    imagepath: "assets/google.png",
+                  ),
+                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Dont Have account!"),
+                    const Text("Not a member!"),
                     TextButton(
                         onPressed: () {
                           Navigator.pushNamed(context, Routesname.signup);
                         },
                         child: const Text(
-                          "Signup",
+                          "Register Now",
                           style: TextStyle(color: AppColors.blue),
                         )),
                   ],
                 ),
-                const Center(child: Text("Other login")),
               ],
             ),
           ),

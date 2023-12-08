@@ -32,7 +32,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
             ),
           ),
           child: BottomNavigationBar(
-            selectedItemColor: AppColors.red,
+            selectedItemColor: AppColors.blue,
             currentIndex: _currentIndex,
             onTap: (index) {
               setState(() {

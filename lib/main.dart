@@ -1,7 +1,9 @@
+import 'package:attendance_app/components/colors.dart';
 import 'package:attendance_app/firebase_options.dart';
 import 'package:attendance_app/provider/Authentication_provider.dart';
 import 'package:attendance_app/provider/Get_User_Data.dart';
 import 'package:attendance_app/provider/Login_provider.dart';
+import 'package:attendance_app/provider/Mark_Leave_provider.dart';
 import 'package:attendance_app/provider/signup_provider.dart';
 import 'package:attendance_app/services/User_vIew_model.dart';
 import 'package:attendance_app/utils/Routes.dart';
@@ -41,11 +43,12 @@ class MyApp extends StatelessWidget {
               ChangeNotifierProvider(create: (context) => login()),
               ChangeNotifierProvider(create: (context) => User_view_Model()),
               ChangeNotifierProvider(create: (context) => UserDataProvider()),
+              ChangeNotifierProvider(create: (context) => Mark_leave()),
             ],
             child: MaterialApp(
               title: 'Flutter Demo',
               theme: ThemeData(
-                colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+                colorScheme: ColorScheme.fromSeed(seedColor: AppColors.blue),
                 useMaterial3: true,
               ),
               debugShowCheckedModeBanner: false,

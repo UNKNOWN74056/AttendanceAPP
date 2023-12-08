@@ -58,7 +58,7 @@ class _Signup_PageState extends State<Signup_Page> {
                       hintext: "Enter your email",
                       errortext: value.email.error,
                       maxlines: 1,
-                      prefixicon: const Icon(FontAwesomeIcons.envelope),
+                      prefixicon: const Icon(FontAwesomeIcons.solidEnvelope),
                       onchange: (String value) {
                         signupcontroller.validateEmail(value);
                       },

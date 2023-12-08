@@ -199,4 +199,7 @@ class UserDataProvider extends ChangeNotifier {
       print('Error during check-out: $e');
     }
   }
+  
 }
+
+

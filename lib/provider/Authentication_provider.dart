@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:attendance_app/model/Edit_model.dart';
+import 'package:attendance_app/model/Mark_leave_model.dart';
 import 'package:attendance_app/model/Signup_model.dart';
 import 'package:attendance_app/model/User_token.dart';
 import 'package:attendance_app/utils/Routes_Names.dart';
@@ -8,6 +9,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:intl/intl.dart';
 
 import '../services/User_vIew_model.dart';
 
@@ -17,6 +20,8 @@ class Auth_Provider with ChangeNotifier {
   final _auth = FirebaseAuth.instance;
   File? _selectedImage;
   bool _isLoading = false;
+  final _googleSignIn = GoogleSignIn();
+  final User_view_Model _userViewModel = User_view_Model();
 
   File? get selectedImage => _selectedImage;
   bool get isLoading => _isLoading;
@@ -151,15 +156,14 @@ class Auth_Provider with ChangeNotifier {
           "age": user.age,
           "location": user.location,
           "image": imageurl
-        });
+        }).then(
+            (value) => utils.showToastMessage("Profile updated successfully"));
 
         // Notify listeners if needed
         notifyListeners();
 
         // Close the edit profile page or perform any navigation as needed
         Navigator.pop(context);
-
-        utils.showToastMessage("Profile updated successfully");
       } catch (e) {
         print("Error updating profile: $e");
         utils.showToastMessage("Failed to update profile");
@@ -192,5 +196,84 @@ class Auth_Provider with ChangeNotifier {
     }
   }
 
-  ///////////////////////////////////////////////////////////
+  // Sign in with Google method
+  Future<void> signInWithGoogle(BuildContext context) async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+
+      if (googleUser == null) {
+        // User canceled the sign-in
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
+      final User? firebaseUser = userCredential.user;
+
+      if (firebaseUser != null) {
+        final idTokenResult = await firebaseUser.getIdToken();
+        final UseremailResult = firebaseUser.email;
+
+        // Save user token to SharedPreferences
+        await _userViewModel
+            .saveUser(UserToken(token: idTokenResult, email: UseremailResult));
+
+        // Update Firestore with user information
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(UseremailResult)
+            .set({
+          'email': UseremailResult,
+          // Add more fields as needed
+        });
+
+        // Handle the sign-in with Google success
+        // You can update your UI or perform any other actions
+        // ...
+
+        // Notify listeners or navigate to the next screen
+        Navigator.pushNamed(context, Routesname.attendance_screen);
+        notifyListeners();
+      }
+    } catch (error) {
+      print('Google Sign-In failed: $error');
+    }
+  }
+
+  // Mark leave function
+  Future<void> Mark_leave(BuildContext context, Markleave mark) async {
+    final currentUser = FirebaseAuth.instance.currentUser!;
+    try {
+      final Date = DateFormat('dd MMMM yyyy').format(DateTime.now());
+      FirebaseFirestore.instance
+          .collection("users")
+          .doc(currentUser.email)
+          .collection("Markleave")
+          .doc(Date)
+          .set({
+        "To_Date": mark.toDate,
+        "From_Date": mark.fromDate,
+        "Reasone": mark.reasone,
+      }).then((_) {
+        utils.showToastMessage("Your mark leave request has been sent");
+        print("Markleave added to Firestore");
+        notifyListeners();
+      }).catchError((error) {
+        utils.showToastMessage("Error while adding Markleave to Firestore");
+        print("Error while adding Markleave to Firestore: $error");
+      });
+    } catch (e) {
+      utils.showToastMessage("Error while requesting");
+      print("Error while requesting: $e");
+    }
+  }
+
+  ///////////////////////////////////////////////////
 }

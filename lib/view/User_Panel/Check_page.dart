@@ -1,3 +1,4 @@
+import 'package:attendance_app/components/Mark_leave.dart';
 import 'package:attendance_app/components/colors.dart';
 import 'package:attendance_app/provider/Get_User_Data.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +77,15 @@ class _CheckPageState extends State<CheckPage> {
         child: Scaffold(
           floatingActionButton: FloatingActionButton.extended(
             backgroundColor: AppColors.white,
-            onPressed: () {},
+            onPressed: () {
+              // Show the MarkLeaveDialog when the button is pressed
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return const MarkLeaveDialog();
+                },
+              );
+            },
             label: const Text(
               "Mark leave",
               style: TextStyle(color: AppColors.blue),
@@ -181,7 +190,7 @@ class _CheckPageState extends State<CheckPage> {
                     text: TextSpan(
                       text: DateTime.now().day.toString(),
                       style: TextStyle(
-                        color: Colors.red,
+                        color: AppColors.red,
                         fontSize: screeenwidth / 18,
                         fontWeight: FontWeight.bold,
                       ),
@@ -233,7 +242,7 @@ class _CheckPageState extends State<CheckPage> {
                               fontSize: screeenwidth / 20,
                             ),
                             outerColor: AppColors.white,
-                            innerColor: Colors.red,
+                            innerColor: AppColors.blue,
                             key: key,
                             onSubmit: () async {
                               await Future.delayed(
